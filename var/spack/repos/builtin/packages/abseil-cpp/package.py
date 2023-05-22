@@ -58,18 +58,16 @@ class AbseilCpp(CMakePackage):
 
     variant(
         "cxxstd",
-        values=(conditional("11", when="@:2022"), "14", "17", "20"),
+        values=("11", "14", "17", "20"),
         default="14",
         description="C++ standard used during compilation",
     )
 
-    depends_on("cmake@3.10:", when="@2023:", type="build")
-    depends_on("cmake@3.5:", when="@2019:", type="build")
-    depends_on("cmake@3.1:", type="build")
-
     def cmake_args(self):
+        shared = "ON" if "+shared" in self.spec else "OFF"
+        cxxstd = self.spec.variants["cxxstd"].value
         return [
-            self.define("BUILD_TESTING", False),
-            self.define_from_variant("BUILD_SHARED_LIBS", "shared"),
-            self.define_from_variant("CMAKE_CXX_STANDARD", "cxxstd"),
+            self.define("BUILD_TESTING", "OFF"),
+            self.define("BUILD_SHARED_LIBS:Bool", shared),
+            self.define("CMAKE_CXX_STANDARD", cxxstd),
         ]
